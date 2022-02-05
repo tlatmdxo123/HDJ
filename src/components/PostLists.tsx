@@ -24,7 +24,12 @@ const PostLists: React.FC<Props> = ({ boardId, posts }) => {
   return (
     <Container onClick={(e) => handleDoubleClick(e)} ref={containerRef}>
       {posts.map((post) => (
-        <PostItem key={post.id} boardId={boardId} {...post} />
+        <PostItem
+          key={post.id}
+          boardId={boardId}
+          boardPos={{ x: currentPosition?.x as number, y: currentPosition?.y as number }}
+          {...post}
+        />
       ))}
       {edit && <PostItemEdit position={pos} onCancel={() => setEdit(false)} boardId={boardId} />}
     </Container>
@@ -34,6 +39,7 @@ const PostLists: React.FC<Props> = ({ boardId, posts }) => {
 const Container = styled.ul`
   position: relative;
   height: 100%;
+  overflow: hidden;
 `;
 
 export default PostLists;
