@@ -63,7 +63,11 @@ type RequestAction =
 //reducer
 
 const initialState: Board[] = [
-  { id: 'aaa', name: 'my first board', posts: [{ id: 'abc', title: 'this is awesome!!', content: 'today todo' }] },
+  {
+    id: 'aaa',
+    name: 'my first board',
+    posts: [{ id: 'abc', title: 'this is awesome!!', content: 'today todo', position: { x: 100, y: 100 } }],
+  },
 ];
 
 function boardsReducer(state: Board[] = initialState, action: RequestAction) {

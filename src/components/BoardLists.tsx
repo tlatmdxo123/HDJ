@@ -64,6 +64,7 @@ const BoardLists: React.FC = () => {
           type="text"
           ref={inputRef}
           value={newBoardName}
+          autoFocus
           placeholder="보드 이름을 입력하세요"
           onChange={(e) => setNewBoardName(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && addNewBoard(newBoardName)}

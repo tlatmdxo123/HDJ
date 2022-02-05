@@ -13,11 +13,19 @@ code {
 button {
   border: none;
   background: none;
+  cursor: pointer;
 }
 
+textarea,
 input {
   border: none;
 }
 input:focus {
   outline: none;
+}
+textarea:focus {
+  outline: none;
+}
+li {
+  list-style: none;
 }
