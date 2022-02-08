@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { MdHighlightOff, MdAddCircleOutline, MdRemoveCircleOutline } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
@@ -23,9 +23,11 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
   const [initialClickPos, setInitialClickPos] = useState<Position>();
   const [isDrag, setIsDrag] = useState(false);
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   function onMouseDownHandler(e: React.MouseEvent) {
     setIsDrag(true);
-    setInitialClickPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
+    if (e.target === headerRef.current) setInitialClickPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
   }
   function onMouseMoveHandler(e: React.MouseEvent) {
     if (isDrag && initialClickPos) {
@@ -34,7 +36,6 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
       //boardPos - 보드안에서의 상대값을 계산하기 위한 보드의 위치값
       const nextX = e.pageX - initialClickPos.x - boardPos.x;
       const nextY = e.pageY - initialClickPos.y - boardPos.y;
-
       //보드를 벗어나지 않게 하기 위해 설정
       setCurrPos({ x: nextX < 0 ? 0 : nextX, y: nextY < 0 ? 0 : nextY });
     }
@@ -60,8 +61,16 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
     <PostItemEdit post={{ id, title, content, position }} boardId={boardId} onCancel={() => setEdit(false)} />
   ) : (
     <PostContainer position={currentPos} isDrag={isDrag}>
-      <PostHeader onMouseDown={onMouseDownHandler} onMouseMove={onMouseMoveHandler} onMouseUp={onDragEnd} onMouseLeave={onDragEnd}>
-        <Title onClick={() => setEdit(true)}>{title}</Title>
+      <PostHeader>
+        <PostHeaderTitle
+          ref={headerRef}
+          onMouseDown={onMouseDownHandler}
+          onMouseMove={onMouseMoveHandler}
+          onMouseUp={onDragEnd}
+          onMouseLeave={onDragEnd}
+        >
+          <Title onClick={() => setEdit(true)}>{title}</Title>
+        </PostHeaderTitle>
         <Buttons>
           <Button type="button" onClick={() => setOpen((status) => !status)}>
             {open ? <MdRemoveCircleOutline /> : <MdAddCircleOutline />}
@@ -78,6 +87,7 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
 
 export const PostContainer = styled.li<{ position: Position; isDrag?: boolean }>`
   position: absolute;
+  width: 250px;
   left: ${({ position }) => position.x + 'px'};
   top: ${({ position }) => position.y + 'px'};
   border-radius: 10px;
@@ -86,16 +96,20 @@ export const PostContainer = styled.li<{ position: Position; isDrag?: boolean }>
   box-shadow: ${({ isDrag }) => (isDrag ? '3px 3px 10px rgba(0,0,0,0.5)' : '')};
 `;
 export const PostHeader = styled.div`
-  height: 30px;
   display: flex;
-  justify-content: space-between;
   background: #d0bfff;
+  height: 30px;
   padding: 5px;
+`;
+const PostHeaderTitle = styled.div`
+  flex-grow: 1;
   cursor: grab;
 `;
 const Title = styled.h5`
   margin: 0;
+  width: max-content;
   min-width: 100px;
+  height: 100%;
   cursor: text;
 `;
 const Buttons = styled.div`
@@ -103,12 +117,13 @@ const Buttons = styled.div`
 `;
 const Button = styled.button`
   padding: 0;
+  font-size: 20px;
+  height: 100%;
 `;
 
 export const PostBody = styled.div`
   min-width: 250px;
   height: 200px;
-  width: 250px;
   padding: 5px;
 `;
 export default PostItem;
