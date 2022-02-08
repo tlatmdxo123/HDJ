@@ -1,8 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Position, Post } from '../types/post';
+import { addPost } from '../store/Boards';
+import { Post } from '../types/post';
+import { uuidv4 } from '../utils/uuid';
 import PostItem from './PostItem';
-import PostItemEdit from './PostItemEdit';
 
 interface Props {
   boardId: string;
@@ -10,15 +12,20 @@ interface Props {
 }
 
 const PostLists: React.FC<Props> = ({ boardId, posts }) => {
-  const [edit, setEdit] = useState(false);
-  const [pos, setPos] = useState<Position>({ x: 0, y: 0 });
+  const dispatch = useDispatch();
   const containerRef = useRef<HTMLUListElement>(null);
 
   const currentPosition = containerRef.current?.getBoundingClientRect();
   function handleDoubleClick(e: React.MouseEvent) {
-    if (e.detail === 2 && currentPosition && !edit) {
-      setEdit(true);
-      setPos({ x: e.clientX - currentPosition.x, y: e.clientY - currentPosition.y });
+    if (e.detail === 2 && currentPosition) {
+      const newPost = {
+        id: uuidv4(),
+        title: '',
+        content: '',
+        position: { x: e.clientX - currentPosition.x, y: e.clientY - currentPosition.y },
+      };
+
+      dispatch(addPost(boardId, newPost));
     }
   }
   return (
@@ -31,7 +38,6 @@ const PostLists: React.FC<Props> = ({ boardId, posts }) => {
           {...post}
         />
       ))}
-      {edit && <PostItemEdit position={pos} onCancel={() => setEdit(false)} boardId={boardId} />}
     </Container>
   );
 };

@@ -4,6 +4,7 @@ import { MdHighlightOff, MdAddCircleOutline, MdRemoveCircleOutline } from 'react
 import { useDispatch } from 'react-redux';
 import { editPost, removePost } from '../store/Boards';
 import { Position } from '../types/post';
+import PostItemEdit from './PostItemEdit';
 
 interface Props {
   id: string;
@@ -16,6 +17,7 @@ interface Props {
 
 const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boardPos }) => {
   const dispatch = useDispatch();
+  const [edit, setEdit] = useState(false);
   const [open, setOpen] = useState(true);
   const [currentPos, setCurrPos] = useState(position);
   const [initialClickPos, setInitialClickPos] = useState<Position>();
@@ -51,25 +53,27 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
   function removePostItem() {
     dispatch(removePost(boardId, id));
   }
-  return (
-    <PostContainer position={currentPos}>
+  return edit ? (
+    <PostItemEdit post={{ id, title, content, position }} boardId={boardId} onCancel={() => setEdit(false)} />
+  ) : (
+    <PostContainer position={currentPos} isDrag={isDrag}>
       <PostHeader onMouseDown={onMouseDownHandler} onMouseMove={onMouseMoveHandler} onMouseUp={onDragEnd} onMouseLeave={onDragEnd}>
-        <Title>{title}</Title>
+        <Title onClick={() => setEdit(true)}>{title}</Title>
         <Buttons>
-          {open ? (
-            <MdRemoveCircleOutline type="button" onClick={() => setOpen(false)} />
-          ) : (
-            <MdAddCircleOutline type="button" onClick={() => setOpen(true)} />
-          )}
-          <MdHighlightOff onClick={removePostItem} />
+          <Button type="button" onClick={() => setOpen((status) => !status)}>
+            {open ? <MdRemoveCircleOutline /> : <MdAddCircleOutline />}
+          </Button>
+          <Button type="button" onClick={removePostItem}>
+            <MdHighlightOff />
+          </Button>
         </Buttons>
       </PostHeader>
-      {open && <PostBody>{content}</PostBody>}
+      {open && <PostBody onClick={() => setEdit(true)}>{content}</PostBody>}
     </PostContainer>
   );
 };
 
-export const PostContainer = styled.li<{ position: Position }>`
+export const PostContainer = styled.li<{ position: Position; isDrag?: boolean }>`
   width: 250px;
   position: absolute;
   left: ${({ position }) => position.x + 'px'};
@@ -77,6 +81,7 @@ export const PostContainer = styled.li<{ position: Position }>`
   border-radius: 10px;
   border: 1px solid #d0bfff;
   overflow: hidden;
+  box-shadow: ${({ isDrag }) => (isDrag ? '3px 3px 10px rgba(0,0,0,0.5)' : '')};
 `;
 export const PostHeader = styled.div`
   height: 30px;
@@ -84,15 +89,22 @@ export const PostHeader = styled.div`
   justify-content: space-between;
   background: #d0bfff;
   padding: 5px;
+  cursor: grab;
 `;
 const Title = styled.h5`
   margin: 0;
+  min-width: 100px;
+  cursor: text;
 `;
-const Buttons = styled.button`
+const Buttons = styled.div`
   display: flex;
+`;
+const Button = styled.button`
+  padding: 0;
 `;
 
 export const PostBody = styled.div`
+  min-width: 100px;
   height: 200px;
   padding: 5px;
 `;

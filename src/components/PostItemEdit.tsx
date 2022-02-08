@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Position } from '../types/post';
+import { Post } from '../types/post';
 import { PostBody, PostContainer, PostHeader } from './PostItem';
-import { addPost } from '../store/Boards';
+import { editPost } from '../store/Boards';
 import styled from 'styled-components';
 import { LineButton, PrimaryButton } from './Buttons';
-import { uuidv4 } from '../utils/uuid';
 import { useDispatch } from 'react-redux';
 
 interface Props {
-  position: Position;
+  post: Post;
   onCancel: () => void;
   boardId: string;
 }
-const PostItemEdit: React.FC<Props> = ({ position, onCancel, boardId }) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+const PostItemEdit: React.FC<Props> = ({ post, onCancel, boardId }) => {
+  const { id, title, position, content } = post;
+  const [titleInput, setTitle] = useState(title);
+  const [contentInput, setContent] = useState(content);
 
   const dispatch = useDispatch();
 
@@ -30,26 +30,26 @@ const PostItemEdit: React.FC<Props> = ({ position, onCancel, boardId }) => {
 
   function makeNewPost() {
     const newPost = {
-      id: uuidv4(),
-      title,
-      content,
+      id,
+      title: titleInput,
+      content: contentInput,
       position,
     };
 
-    dispatch(addPost(boardId, newPost));
+    dispatch(editPost(boardId, newPost));
     reset();
   }
 
   return (
     <PostContainer position={position}>
       <PostHeader>
-        <TitleInput type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" autoFocus />
+        <TitleInput type="text" value={titleInput} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" autoFocus />
       </PostHeader>
       <PostBody>
         <ContentInput
           id="post-content"
           name="post-content"
-          value={content}
+          value={contentInput}
           placeholder="내용을 입력하세요"
           onChange={(e) => setContent(e.target.value)}
           onKeyPress={EnterHandler}
