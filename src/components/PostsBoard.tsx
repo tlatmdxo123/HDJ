@@ -3,8 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { selectBoard } from '../selectors/boards';
 import { selectCurrentTab } from '../selectors/tab';
-import { editBoardName } from '../store/Boards';
+import { addPost, editBoardName } from '../store/Boards';
 import { Board } from '../types/board';
+import { uuidv4 } from '../utils/uuid';
 import PostLists from './PostLists';
 
 const PostBoard: React.FC = () => {
@@ -18,6 +19,25 @@ const PostBoard: React.FC = () => {
 
   useEffect(() => {
     if (board) setTitleValue(board.name);
+  }, [board]);
+
+  useEffect(() => {
+    function addPostOnKeyDown(e: KeyboardEvent) {
+      if (e.altKey && e.metaKey && e.code === 'KeyN') {
+        const newPost = {
+          id: uuidv4(),
+          title: '',
+          content: '',
+          position: { x: 0, y: 0 },
+        };
+
+        dispatch(addPost(board.id, newPost));
+      }
+    }
+    if (board) {
+      window.addEventListener('keydown', addPostOnKeyDown);
+      return () => window.removeEventListener('keydown', addPostOnKeyDown);
+    }
   }, [board]);
 
   const dispatch = useDispatch();
