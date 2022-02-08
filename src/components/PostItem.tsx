@@ -51,6 +51,9 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
   }
 
   function removePostItem() {
+    if (title.length > 0 || content.length > 0) {
+      if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    }
     dispatch(removePost(boardId, id));
   }
   return edit ? (
@@ -74,7 +77,6 @@ const PostItem: React.FC<Props> = ({ id, title, content, position, boardId, boar
 };
 
 export const PostContainer = styled.li<{ position: Position; isDrag?: boolean }>`
-  width: 250px;
   position: absolute;
   left: ${({ position }) => position.x + 'px'};
   top: ${({ position }) => position.y + 'px'};
@@ -104,8 +106,9 @@ const Button = styled.button`
 `;
 
 export const PostBody = styled.div`
-  min-width: 100px;
+  min-width: 250px;
   height: 200px;
+  width: 250px;
   padding: 5px;
 `;
 export default PostItem;
