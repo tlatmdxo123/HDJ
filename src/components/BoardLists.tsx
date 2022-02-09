@@ -4,7 +4,7 @@ import { selectBoards } from '../selectors/boards';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { setTab } from '../store/Tab';
-import { addBoard } from '../store/Boards';
+import { addBoard, removeBoard } from '../store/Boards';
 import { uuidv4 } from '../utils/uuid';
 import { selectCurrentTab } from '../selectors/tab';
 
@@ -42,6 +42,10 @@ const BoardLists: React.FC = () => {
     activeTab(id);
   }
 
+  function removeBoardOnClickButton(id: string) {
+    if (window.confirm('정말 삭제하시겠습니까?')) dispatch(removeBoard(id));
+  }
+
   function addButtonClickHandler() {
     if (inputActive) {
       addNewBoard(newBoardName);
@@ -54,9 +58,12 @@ const BoardLists: React.FC = () => {
       <Title>Board Lists</Title>
       <BoardNames role="tablist" aria-label="board tabs">
         {boards.map(({ id, name }) => (
-          <BoardName key={id} role="tab" aria-selected={id === currentTab} selected={id === currentTab} onClick={() => activeTab(id)}>
-            {name}
-          </BoardName>
+          <BoardItem key={id} role="tab" aria-selected={id === currentTab} selected={id === currentTab} onClick={() => activeTab(id)}>
+            <BoardName>{name}</BoardName>
+            <RemoveButton type="button" onClick={() => removeBoardOnClickButton(id)}>
+              x
+            </RemoveButton>
+          </BoardItem>
         ))}
       </BoardNames>
       {inputActive && (
@@ -88,15 +95,20 @@ const Title = styled.h3``;
 
 const BoardNames = styled.div``;
 
-const BoardName = styled.button<{ selected: boolean }>`
+const BoardName = styled.span``;
+const BoardItem = styled.div<{ selected: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
   width: 100%;
   background: ${({ selected }) => (selected ? '#ddb892' : '')};
-  cursor: pointer;
-  text-align: left;
 `;
 const AddButton = styled.button`
   width: 100%;
   cursor: pointer;
+`;
+const RemoveButton = styled.button`
+  color: red;
 `;
 const NameInput = styled.input`
   width: 100%;
