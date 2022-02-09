@@ -1,13 +1,14 @@
 import { Board } from '../types/board';
 import { Post } from '../types/post';
 import { deepCopy } from '../utils/deepCopy';
+import { BoardStorage } from '../utils/localstorage';
 
-const ADD_BOARD = 'ADD_BOARD' as const;
-const EDIT_BOARD_NAME = 'EDIT_BOARD_NAME' as const;
-const REMOVE_BOARD = 'REMOVE_BOARD' as const;
-const ADD_POST = 'ADD_POST' as const;
-const EDIT_POST = 'EDIT_POST' as const;
-const REMOVE_POST = 'REMOVE_POST' as const;
+export const ADD_BOARD = 'ADD_BOARD' as const;
+export const EDIT_BOARD_NAME = 'EDIT_BOARD_NAME' as const;
+export const REMOVE_BOARD = 'REMOVE_BOARD' as const;
+export const ADD_POST = 'ADD_POST' as const;
+export const EDIT_POST = 'EDIT_POST' as const;
+export const REMOVE_POST = 'REMOVE_POST' as const;
 
 //actions
 export const addBoard = (board: Board) => {
@@ -52,7 +53,7 @@ export const removePost = (boardId: string, id: string) => {
   };
 };
 
-type RequestAction =
+export type RequestAction =
   | ReturnType<typeof addPost>
   | ReturnType<typeof editPost>
   | ReturnType<typeof removePost>
@@ -61,14 +62,8 @@ type RequestAction =
   | ReturnType<typeof removeBoard>;
 
 //reducer
-
-const initialState: Board[] = [
-  {
-    id: 'aaa',
-    name: 'my first board',
-    posts: [{ id: 'abc', title: 'this is awesome!!', content: 'today todo', position: { x: 100, y: 100 } }],
-  },
-];
+const storedBoardData = BoardStorage.get();
+const initialState: Board[] = storedBoardData ? storedBoardData : [];
 
 function boardsReducer(state: Board[] = initialState, action: RequestAction) {
   switch (action.type) {
